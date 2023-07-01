@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Spicetify-Seek-On-Scroll",
+    "description": "Spicetify extension to seek on scroll.",
+    "main": "/dist/seekonscroll.js",
+    "readme": "README.md",
+    "authors": [
+        { "name": "Xyntho", "url": "https://github.com/iamxyntho" }
+    ],
+    "tags": ["utility"]
+  },
+  {
+    "name": "seekOnScroll",
+    "description": "Another Spicetify extension to show how to make a manifest.",
+    "main": "dist/myExt.js",
+    "readme": "README.md",
+    "branch": "main"
+  }
+]
