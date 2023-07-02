@@ -4,4 +4,4 @@ A spicetify extension to seek on scroll.
 
 # Preview
 
-![alt-text]()
+![preview-gif](https://github.com/iamxyntho/seekonscroll/blob/main/preview/preview.gif)
