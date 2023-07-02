@@ -16,7 +16,7 @@ async function main() {
   var checkProgBar = setInterval(() => {
     if (
       document.querySelector<HTMLDivElement>(
-        "#main > div > div.Root__top-container > div.Root__now-playing-bar > footer > div > div.main-nowPlayingBar-center > div > div.playback-bar > div.playback-progressbar.playback-progressbar-isInteractive > div"
+        ".playback-progressbar-isInteractive .progress-bar"
       )
     ) {
       onProgBarLoaded();
@@ -27,7 +27,7 @@ async function main() {
   let toPlay = false;
   function onProgBarLoaded() {
     const progBar = document.querySelector<HTMLDivElement>(
-      "#main > div > div.Root__top-container > div.Root__now-playing-bar > footer > div > div.main-nowPlayingBar-center > div > div.playback-bar > div.playback-progressbar.playback-progressbar-isInteractive > div"
+      ".playback-progressbar-isInteractive .progress-bar"
     );
     if (progBar) {
       progBar.addEventListener("wheel", (e) => {
@@ -53,11 +53,11 @@ async function main() {
             }
           
         }
-        debounce(handleStyleChange, 300);
+        debounce(handleSeek, 300);
       });
     }
     
-    function handleStyleChange() {
+    function handleSeek() {
       if (progBar) {
         let currentState = parseFloat(
           progBar.style.getPropertyValue("--progress-bar-transform").split("%")[0]
