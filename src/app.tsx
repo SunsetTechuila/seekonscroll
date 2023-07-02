@@ -2,6 +2,7 @@ async function main() {
   const progBar = document.querySelector<HTMLDivElement>(
     "#main > div > div.Root__top-container > div.Root__now-playing-bar > footer > div > div.main-nowPlayingBar-center > div > div.playback-bar > div.playback-progressbar.playback-progressbar-isInteractive > div"
   );
+  console.log("Seek on scroll loaded!")
   var checkProgBar = setInterval(() => {
     if (progBar) {
       onProgBarLoaded();
@@ -11,27 +12,26 @@ async function main() {
   const sensitivity = 0.2;
   let toPlay = false;
   function onProgBarLoaded() {
-    if (progBar) {
-      progBar.addEventListener("wheel", (e) => {
+      progBar!.addEventListener("wheel", (e) => {
         if (Spicetify.Player.isPlaying()) {
           Spicetify.Player.pause();
           toPlay = true;
         }
 
         let currentState = parseFloat(
-          progBar.style.cssText.split(":")[1].split("%")[0]
+          progBar!.style.cssText.split(":")[1].split("%")[0]
         );
 
         if (currentState <= 100 && currentState >= 0) {
           let changedVal = currentState + e.deltaY * sensitivity;
           if (e.deltaY > 0) {
             if (changedVal <= 100) {
-              progBar.style.cssText =
+              progBar!.style.cssText =
                 "--progress-bar-transform: " + changedVal + "%;";
             }
           } else {
             if (changedVal >= 0) {
-              progBar.style.cssText =
+              progBar!.style.cssText =
                 "--progress-bar-transform: " + changedVal + "%;";
             }
           }
@@ -39,7 +39,6 @@ async function main() {
         debounce(handleStyleChange, 300);
       });
 
-      // Create a new MutationObserver
       const observer = new MutationObserver((mutationsList) => {
         let isWheeling = false;
         // Check each mutation that occurred
@@ -55,15 +54,8 @@ async function main() {
           handleStyleChange();
         }
       });
-
-      // Select the target element
-      const targetElement = progBar;
-
-      // Start observing the target element for mutations
-      observer.observe(targetElement, { attributes: true });
+      observer.observe(progBar, { attributes: true });
     }
-
-    // Debounce function to delay the execution of the handler
     let debounceTimeout: ReturnType<typeof setTimeout>;
     function debounce(func: () => void, delay: number) {
       clearTimeout(debounceTimeout);
@@ -83,7 +75,6 @@ async function main() {
         Spicetify.Player.seek(newProg);
       }
     }
-  }
 }
 
 export default main;

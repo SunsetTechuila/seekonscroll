@@ -3,8 +3,6 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=node
 
 ### Node ###
-#build 
-dist
 # Logs
 logs
 *.log
