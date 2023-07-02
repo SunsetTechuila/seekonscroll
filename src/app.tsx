@@ -8,7 +8,8 @@ async function main() {
   settings.addInput(
     "seekOnScrollSensitivity",
     "Enter sensitivity (Default: 0.022)",
-    "0.022"
+    "0.022",
+    "number"
   );
   settings.pushSettings();
 
@@ -31,17 +32,11 @@ async function main() {
     );
     if (progBar) {
       progBar.addEventListener("wheel", (e) => {
-        if (isNaN(settings.getFieldValue("seekOnScrollSensitivity"))) {
-          Spicetify.showNotification(
-            "Error: Seek on scroll sensitivity is not a number. Please set sensitivity to a number in settings."
-          );
-        }
         let sensitivity = settings.getFieldValue("seekOnScrollSensitivity");
         if (Spicetify.Player.isPlaying() && !toPlay) {
           Spicetify.Player.pause();
           toPlay = true;
         }
-
         let currentState = parseFloat(
           progBar.style.getPropertyValue("--progress-bar-transform").split("%")[0]
         );
