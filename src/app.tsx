@@ -1,27 +1,21 @@
 async function main() {
-  while (!Spicetify?.showNotification) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  Spicetify.showNotification("Hello!");
-  console.log("Hello Xyntho!");
   const progBar = document.querySelector<HTMLDivElement>(
     "#main > div > div.Root__top-container > div.Root__now-playing-bar > footer > div > div.main-nowPlayingBar-center > div > div.playback-bar > div.playback-progressbar.playback-progressbar-isInteractive > div"
   );
   var checkProgBar = setInterval(() => {
     if (progBar) {
-      console.log("progBar loaded!");
       onProgBarLoaded();
       clearInterval(checkProgBar);
     }
   }, 10);
   const sensitivity = 0.2;
-
+  let toPlay = false;
   function onProgBarLoaded() {
     if (progBar) {
       progBar.addEventListener("wheel", (e) => {
-        console.log(e);
         if (Spicetify.Player.isPlaying()) {
           Spicetify.Player.pause();
+          toPlay = true;
         }
 
         let currentState = parseFloat(
@@ -76,10 +70,10 @@ async function main() {
       debounceTimeout = setTimeout(func, delay);
     }
     function handleStyleChange() {
-      if (!Spicetify.Player.isPlaying()) {
+      if (!Spicetify.Player.isPlaying() && toPlay) {
         Spicetify.Player.play();
+        toPlay = false;
       }
-      console.log("Style change complete!");
       if (progBar) {
         let currentState = parseFloat(
           progBar.style.cssText.split(":")[1].split("%")[0]
