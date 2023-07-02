@@ -3,6 +3,7 @@
         "name": "Seek On Scroll",
         "description": "Spicetify extension to seek on scroll.",
         "main": "/dist/seekonscroll.js",
+        "preview": "/preview/preview.gif",
         "readme": "README.md",
         "authors": [
             {

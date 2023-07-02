@@ -2,3 +2,6 @@
 
 A spicetify extension to seek on scroll.
 
+# Preview
+
+![alt-text]()
