@@ -32,38 +32,52 @@ async function main() {
     );
     if (progBar) {
       progBar.addEventListener("wheel", (e) => {
-        let sensitivity = settings.getFieldValue("seekOnScrollSensitivity");
-        if (Spicetify.Player.isPlaying() && !toPlay) {
-          Spicetify.Player.pause();
-          toPlay = true;
-        }
-        let currentState = parseFloat(
-          progBar.style.getPropertyValue("--progress-bar-transform").split("%")[0]
-        );
-        if (currentState <= 100 && currentState >= 0) {
-          let changedVal = currentState + e.deltaY * sensitivity;
-         
+        progBar.classList.add("isProgBarScrolled");
+        let isProgBarScrolled =
+          document.querySelector<HTMLDivElement>(".isProgBarScrolled");
+        if (isProgBarScrolled) {
+          let sensitivity = settings.getFieldValue("seekOnScrollSensitivity");
+          if (Spicetify.Player.isPlaying() && !toPlay) {
+            Spicetify.Player.pause();
+            toPlay = true;
+          }
+          let currentState = parseFloat(
+            isProgBarScrolled.style
+              .getPropertyValue("--progress-bar-transform")
+              .split("%")[0]
+          );
+          if (currentState <= 100 && currentState >= 0) {
+            let changedVal = currentState + e.deltaY * sensitivity;
+
             if (changedVal <= 100 && changedVal >= 0) {
-              progBar.style.setProperty("--progress-bar-transform", changedVal + "%")
+              isProgBarScrolled.style.setProperty(
+                "--progress-bar-transform",
+                changedVal + "%"
+              );
             }
-          
+          }
+          debounce(handleSeek, 200);
         }
-        debounce(handleSeek, 300);
       });
     }
-    
+
     function handleSeek() {
-      if (progBar) {
+      let isProgBarScrolled =
+          document.querySelector<HTMLDivElement>(".isProgBarScrolled");
+      if (isProgBarScrolled && progBar) {
         let currentState = parseFloat(
-          progBar.style.getPropertyValue("--progress-bar-transform").split("%")[0]
-        );
-        let prog = currentState / 100;
-        let newProg = Spicetify.Player.getDuration() * prog;
-        Spicetify.Player.seek(newProg);
-        if (!Spicetify.Player.isPlaying() && toPlay) {
-          Spicetify.Player.play();
-          toPlay = false;
-        }
+          isProgBarScrolled.style
+          .getPropertyValue("--progress-bar-transform")
+          .split("%")[0]
+          );
+          let prog = currentState / 100;
+          let newProg = Spicetify.Player.getDuration() * prog;
+          Spicetify.Player.seek(newProg);
+          if (!Spicetify.Player.isPlaying() && toPlay) {
+            Spicetify.Player.play();
+            toPlay = false;
+          }
+          progBar.classList.remove("isProgBarScrolled");
       }
     }
   }
