@@ -1,68 +1,76 @@
-import { SettingsSection } from "spcr-settings";
+import { SettingsSection } from 'spcr-settings';
+
 function main() {
-  const defaultSkipValueSec = "1"
-  const settings = new SettingsSection(
-    "Seek on scroll",
-    "seekOnScroll"
-  );
+  const { Player } = Spicetify;
+  let scrollTimeout: number;
+  let wasPlaying: boolean | null;
+  let progressBar: HTMLDivElement;
+  const defaultSkipPercent = '3';
+
+  const settings = new SettingsSection('Seek on scroll', 'seekOnScroll');
   settings.addInput(
-    "skipValueSec",
-    "Set the number of seconds to skip on each scroll",
-    defaultSkipValueSec,
+    'skipPercent',
+    'Set the number of seconds to skip on each scroll (1-100)',
+    defaultSkipPercent,
     undefined,
     {
-      type: "number",
-      min: "1"
-    },
+      type: 'number',
+      max: '100',
+      min: '1',
+      placeholder: `Default is ${defaultSkipPercent}`,
+    }
   );
   settings.pushSettings();
 
+  function setProgress(currentProgressPercent: number) {
+    const newProgressMs = (currentProgressPercent / 100) * Player.getDuration();
+    Player.seek(newProgressMs);
+    if (wasPlaying) Player.play();
+    wasPlaying = null;
+  }
+
+  function handleScroll(event: WheelEvent) {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+
+    const isPlaying = Player.isPlaying();
+    if (isPlaying) Player.pause();
+    if (wasPlaying == null) wasPlaying = isPlaying;
+
+    const { deltaY } = event;
+    const { style } = progressBar;
+
+    const currentSkipPercent = parseInt(settings.getFieldValue('skipPercent'), 10);
+    const currentProgressPercent = parseFloat(style.getPropertyValue('--progress-bar-transform'));
+
+    let newProgressPercent;
+    if (deltaY > 0) newProgressPercent = currentProgressPercent - currentSkipPercent;
+    else if (deltaY < 0) newProgressPercent = currentProgressPercent + currentSkipPercent;
+
+    style.setProperty('--progress-bar-transform', `${newProgressPercent}%`);
+
+    scrollTimeout = setTimeout(setProgress, 400, newProgressPercent);
+  }
+
+  function onProgressBarLoad() {
+    progressBar.addEventListener('wheel', (event) => handleScroll(event));
+  }
+
   function waitForProgressBar() {
-    const progressBar = document.querySelector<HTMLDivElement>(
-      ".playback-bar .playback-progressbar-isInteractive .progress-bar"
-    );
+    progressBar = document.querySelector(
+      '.playback-bar .playback-progressbar-isInteractive .progress-bar'
+    ) as HTMLDivElement;
     if (progressBar) {
-      onProgressBarLoad(progressBar);
-    }
-    else {
+      onProgressBarLoad();
+    } else {
       setTimeout(waitForProgressBar, 100);
     }
   }
+
   waitForProgressBar();
-  document.addEventListener("fullscreenchange", () => {
-    setTimeout(waitForProgressBar, 300)
+
+  document.addEventListener('fullscreenchange', () => {
+    setTimeout(waitForProgressBar, 300);
   });
-
-  function onProgressBarLoad(progressBar: HTMLDivElement) {
-    progressBar.addEventListener("wheel", (event) => skip(event))
-  }
-
-  function skip(event: WheelEvent) {
-    let currentSkipValueSec = parseInt(
-      settings.getFieldValue("skipValueSec")
-      , 10);
-    const maxSkipValueSec = Spicetify.Player.getDuration() / 1000
-    let currentSkipValueMs;
-
-    switch (true) {
-      case currentSkipValueSec < 1:
-        currentSkipValueMs = parseInt(defaultSkipValueSec, 10) * 1000;
-        break;
-      case currentSkipValueSec > maxSkipValueSec:
-        currentSkipValueMs = maxSkipValueSec * 1000;
-        break;
-      default:
-        currentSkipValueMs = currentSkipValueSec * 1000;
-        break;
-    }
-
-    if (event.deltaY > 0) {
-      Spicetify.Player.skipBack(currentSkipValueMs);
-    }
-    else if (event.deltaY < 0) {
-      Spicetify.Player.skipForward(currentSkipValueMs);
-    }
-  }
 }
 
 export default main;
