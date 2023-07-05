@@ -1,20 +1,27 @@
 {
   "name": "seekonscroll",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "spicetify-creator",
     "build-local": "spicetify-creator --out=dist --minify",
     "watch": "spicetify-creator --watch"
   },
+  "author": "Xyntho and Grigory",
   "license": "MIT",
   "devDependencies": {
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "eslint-config-airbnb-base-typescript": "^1.1.0",
+    "eslint-config-prettier": "^8.8.0",
+    "prettier": "^2.8.8",
     "spicetify-creator": "^1.0.13",
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "spcr-settings": "^1.1.0"
+    "spcr-settings": "^1.2.0"
   }
 }
