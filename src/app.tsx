@@ -1,84 +1,66 @@
 import { SettingsSection } from "spcr-settings";
-import debounce from "./modules/debounce";
-async function main() {
+function main() {
+  const defaultSkipValueSec = "1"
   const settings = new SettingsSection(
-    "Seek on scroll sensitivity",
-    "seekOnScrollSensitivity"
+    "Seek on scroll",
+    "seekOnScroll"
   );
   settings.addInput(
-    "seekOnScrollSensitivity",
-    "Enter sensitivity (Default: 0.022)",
-    "0.022",
-    "number"
+    "skipValueSec",
+    "Set the number of seconds to skip on each scroll",
+    defaultSkipValueSec,
+    undefined,
+    {
+      type: "number",
+      min: "1"
+    },
   );
   settings.pushSettings();
 
-  console.log("Seek on scroll loaded!");
-  var checkProgBar = setInterval(() => {
-    if (
-      document.querySelector<HTMLDivElement>(
-        ".playback-progressbar-isInteractive .progress-bar"
-      )
-    ) {
-      onProgBarLoaded();
-      console.log("Prog bar loaded!");
-      clearInterval(checkProgBar);
-    }
-  }, 10);
-  let toPlay = false;
-  function onProgBarLoaded() {
-    const progBar = document.querySelector<HTMLDivElement>(
-      ".playback-progressbar-isInteractive .progress-bar"
+  function waitForProgressBar() {
+    const progressBar = document.querySelector<HTMLDivElement>(
+      ".playback-bar .playback-progressbar-isInteractive .progress-bar"
     );
-    if (progBar) {
-      progBar.addEventListener("wheel", (e) => {
-        progBar.classList.add("isProgBarScrolled");
-        let isProgBarScrolled =
-          document.querySelector<HTMLDivElement>(".isProgBarScrolled");
-        if (isProgBarScrolled) {
-          let sensitivity = settings.getFieldValue("seekOnScrollSensitivity");
-          if (Spicetify.Player.isPlaying() && !toPlay) {
-            Spicetify.Player.pause();
-            toPlay = true;
-          }
-          let currentState = parseFloat(
-            isProgBarScrolled.style
-              .getPropertyValue("--progress-bar-transform")
-              .split("%")[0]
-          );
-          if (currentState <= 100 && currentState >= 0) {
-            let changedVal = currentState + e.deltaY * sensitivity;
+    if (progressBar) {
+      onProgressBarLoad(progressBar);
+    }
+    else {
+      setTimeout(waitForProgressBar, 100);
+    }
+  }
+  waitForProgressBar();
+  document.addEventListener("fullscreenchange", () => {
+    setTimeout(waitForProgressBar, 300)
+  });
 
-            if (changedVal <= 100 && changedVal >= 0) {
-              isProgBarScrolled.style.setProperty(
-                "--progress-bar-transform",
-                changedVal + "%"
-              );
-            }
-          }
-          debounce(handleSeek, 200);
-        }
-      });
+  function onProgressBarLoad(progressBar: HTMLDivElement) {
+    progressBar.addEventListener("wheel", (event) => skip(event))
+  }
+
+  function skip(event: WheelEvent) {
+    let currentSkipValueSec = parseInt(
+      settings.getFieldValue("skipValueSec")
+      , 10);
+    const maxSkipValueSec = Spicetify.Player.getDuration() / 1000
+    let currentSkipValueMs;
+
+    switch (true) {
+      case currentSkipValueSec < 1:
+        currentSkipValueMs = parseInt(defaultSkipValueSec, 10) * 1000;
+        break;
+      case currentSkipValueSec > maxSkipValueSec:
+        currentSkipValueMs = maxSkipValueSec * 1000;
+        break;
+      default:
+        currentSkipValueMs = currentSkipValueSec * 1000;
+        break;
     }
 
-    function handleSeek() {
-      let isProgBarScrolled =
-          document.querySelector<HTMLDivElement>(".isProgBarScrolled");
-      if (isProgBarScrolled && progBar) {
-        let currentState = parseFloat(
-          isProgBarScrolled.style
-          .getPropertyValue("--progress-bar-transform")
-          .split("%")[0]
-          );
-          let prog = currentState / 100;
-          let newProg = Spicetify.Player.getDuration() * prog;
-          Spicetify.Player.seek(newProg);
-          if (!Spicetify.Player.isPlaying() && toPlay) {
-            Spicetify.Player.play();
-            toPlay = false;
-          }
-          progBar.classList.remove("isProgBarScrolled");
-      }
+    if (event.deltaY > 0) {
+      Spicetify.Player.skipBack(currentSkipValueMs);
+    }
+    else if (event.deltaY < 0) {
+      Spicetify.Player.skipForward(currentSkipValueMs);
     }
   }
 }
