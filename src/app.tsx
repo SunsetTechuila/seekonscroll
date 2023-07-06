@@ -46,8 +46,13 @@ function main() {
     const currentProgressPercent = parseFloat(style.getPropertyValue('--progress-bar-transform'));
 
     let newProgressPercent;
-    if (deltaY > 0) newProgressPercent = currentProgressPercent - currentSkipPercent;
-    else if (deltaY < 0) newProgressPercent = currentProgressPercent + currentSkipPercent;
+    if (deltaY > 0) {
+      newProgressPercent = currentProgressPercent - currentSkipPercent;
+      if (newProgressPercent < 0) newProgressPercent = 0;
+    } else if (deltaY < 0) {
+      newProgressPercent = currentProgressPercent + currentSkipPercent;
+      if (newProgressPercent > 100) newProgressPercent = 100;
+    }
 
     style.setProperty('--progress-bar-transform', `${newProgressPercent}%`);
 
