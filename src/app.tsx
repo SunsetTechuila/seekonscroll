@@ -5,7 +5,8 @@ function main() {
   let scrollTimeout: NodeJS.Timeout;
   let wasPlaying: boolean | null;
   let progressBar: HTMLDivElement;
-  let progressBarTimeElapsed: HTMLDivElement;
+  let progressBarElapsed: HTMLDivElement;
+  let progressBarRemaining: HTMLDivElement;
   const defaultSkipPercent = '3';
 
   const settings = new SettingsSection('Seek on scroll', 'seekOnScroll');
@@ -58,15 +59,27 @@ function main() {
         return;
     }
 
-    const newProgressMs = (newProgressPercent / 100) * Player.getDuration();
+    const durationMs = Player.getDuration();
+
+    const newProgressMs = (newProgressPercent / 100) * durationMs;
     const newProgressMin = Math.floor(newProgressMs / 60000);
     const newProgressSec = Math.floor((newProgressMs % 60000) / 1000);
+    const zerosProgress = '0'.repeat(2 - newProgressSec.toString().length);
+    const newProgressTime = `${newProgressMin}:${zerosProgress}${newProgressSec}`;
 
-    const zeros = '0'.repeat(2 - newProgressSec.toString().length);
-    const newProgressTime = `${newProgressMin}:${zeros}${newProgressSec}`;
+    const showRemaining = progressBarRemaining.innerHTML.startsWith('-');
+    if (showRemaining) {
+      const remainingMs = durationMs - newProgressMs;
+      const remainingMin = Math.floor(remainingMs / 60000);
+      const remainingSec = Math.floor((remainingMs % 60000) / 1000);
+      const zerosRemaining = '0'.repeat(2 - remainingSec.toString().length);
+      const remainingTime = `-${remainingMin}:${zerosRemaining}${remainingSec}`;
+
+      progressBarRemaining.innerHTML = remainingTime;
+    }
 
     style.setProperty('--progress-bar-transform', `${newProgressPercent}%`);
-    progressBarTimeElapsed.innerHTML = newProgressTime;
+    progressBarElapsed.innerHTML = newProgressTime;
 
     scrollTimeout = setTimeout(setProgress, 400, newProgressMs);
   }
@@ -80,8 +93,11 @@ function main() {
       '.playback-bar .playback-progressbar-isInteractive .progress-bar'
     ) as HTMLDivElement;
     if (progressBar) {
-      progressBarTimeElapsed = document.querySelector(
+      progressBarElapsed = document.querySelector(
         '.playback-bar__progress-time-elapsed'
+      ) as HTMLDivElement;
+      progressBarRemaining = document.querySelector(
+        '.main-playbackBarRemainingTime-container'
       ) as HTMLDivElement;
       onProgressBarLoad();
     } else {
@@ -90,7 +106,6 @@ function main() {
   }
 
   waitForProgressBar();
-
   document.addEventListener('fullscreenchange', () => {
     setTimeout(waitForProgressBar, 300);
   });
