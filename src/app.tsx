@@ -20,6 +20,7 @@ function main() {
       placeholder: `Default is ${defaultSkipPercent}`,
     }
   );
+  settings.addToggle('invertScroll', 'Invert scroll direction', false);
   settings.pushSettings();
 
   function setProgress(currentProgressPercent: number) {
@@ -36,8 +37,10 @@ function main() {
     if (isPlaying) Player.pause();
     if (wasPlaying == null) wasPlaying = isPlaying;
 
-    const { deltaY } = event;
+    let { deltaY } = event;
     const { style } = progressBar;
+
+    if (settings.getFieldValue('invertScroll')) deltaY = -deltaY;
 
     const currentSkipPercent = parseInt(settings.getFieldValue('skipPercent'), 10);
     const currentProgressPercent = parseFloat(style.getPropertyValue('--progress-bar-transform'));
