@@ -2,9 +2,10 @@ import { SettingsSection } from 'spcr-settings';
 
 function main() {
   const { Player } = Spicetify;
-  let scrollTimeout: number;
+  let scrollTimeout: NodeJS.Timeout;
   let wasPlaying: boolean | null;
   let progressBar: HTMLDivElement;
+  let progressBarTimeElapsed: HTMLDivElement;
   const defaultSkipPercent = '3';
 
   const settings = new SettingsSection('Seek on scroll', 'seekOnScroll');
@@ -23,8 +24,7 @@ function main() {
   settings.addToggle('invertScroll', 'Invert scroll direction', false);
   settings.pushSettings();
 
-  function setProgress(currentProgressPercent: number) {
-    const newProgressMs = (currentProgressPercent / 100) * Player.getDuration();
+  function setProgress(newProgressMs: number) {
     Player.seek(newProgressMs);
     if (wasPlaying) Player.play();
     wasPlaying = null;
@@ -37,26 +37,38 @@ function main() {
     if (isPlaying) Player.pause();
     if (wasPlaying == null) wasPlaying = isPlaying;
 
-    let { deltaY } = event;
     const { style } = progressBar;
-
+    let { deltaY } = event;
     if (settings.getFieldValue('invertScroll')) deltaY = -deltaY;
 
     const currentSkipPercent = parseInt(settings.getFieldValue('skipPercent'), 10);
     const currentProgressPercent = parseFloat(style.getPropertyValue('--progress-bar-transform'));
 
     let newProgressPercent;
-    if (deltaY > 0) {
-      newProgressPercent = currentProgressPercent - currentSkipPercent;
-      if (newProgressPercent < 0) newProgressPercent = 0;
-    } else if (deltaY < 0) {
-      newProgressPercent = currentProgressPercent + currentSkipPercent;
-      if (newProgressPercent > 100) newProgressPercent = 100;
+    switch (true) {
+      case deltaY > 0:
+        newProgressPercent = currentProgressPercent - currentSkipPercent;
+        if (newProgressPercent < 0) newProgressPercent = 0;
+        break;
+      case deltaY < 0:
+        newProgressPercent = currentProgressPercent + currentSkipPercent;
+        if (newProgressPercent > 100) newProgressPercent = 100;
+        break;
+      default:
+        return;
     }
 
-    style.setProperty('--progress-bar-transform', `${newProgressPercent}%`);
+    const newProgressMs = (newProgressPercent / 100) * Player.getDuration();
+    const newProgressMin = Math.floor(newProgressMs / 60000);
+    const newProgressSec = Math.floor((newProgressMs % 60000) / 1000);
 
-    scrollTimeout = setTimeout(setProgress, 400, newProgressPercent);
+    const zeros = '0'.repeat(2 - newProgressSec.toString().length);
+    const newProgressTime = `${newProgressMin}:${zeros}${newProgressSec}`;
+
+    style.setProperty('--progress-bar-transform', `${newProgressPercent}%`);
+    progressBarTimeElapsed.innerHTML = newProgressTime;
+
+    scrollTimeout = setTimeout(setProgress, 400, newProgressMs);
   }
 
   function onProgressBarLoad() {
@@ -68,6 +80,9 @@ function main() {
       '.playback-bar .playback-progressbar-isInteractive .progress-bar'
     ) as HTMLDivElement;
     if (progressBar) {
+      progressBarTimeElapsed = document.querySelector(
+        '.playback-bar__progress-time-elapsed'
+      ) as HTMLDivElement;
       onProgressBarLoad();
     } else {
       setTimeout(waitForProgressBar, 100);
