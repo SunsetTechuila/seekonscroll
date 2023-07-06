@@ -12,7 +12,7 @@ function main() {
   const settings = new SettingsSection('Seek on scroll', 'seekOnScroll');
   settings.addInput(
     'skipPercent',
-    'Set the number of seconds to skip on each scroll (1-100)',
+    'Set percentage of track time to skip on each scroll (1-100 int)',
     defaultSkipPercent,
     undefined,
     {
