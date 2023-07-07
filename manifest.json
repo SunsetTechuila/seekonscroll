@@ -1,18 +1,22 @@
 [
     {
         "name": "Seek On Scroll",
-        "description": "Spicetify extension to seek on scroll.",
+        "description": "Skip track time using mouse wheel",
         "main": "/dist/seekonscroll.js",
-        "preview": "/preview/preview_marketplace.gif",
+        "preview": "/assets/preview_marketplace.gif",
         "readme": "README.md",
         "authors": [
+            {
+                "name": "Grigory",
+                "url": "https://github.com/SunsetTechuila"
+            },
             {
                 "name": "Xyntho",
                 "url": "https://github.com/iamxyntho"
             }
         ],
         "tags": [
-            "utility"
+            "utility", "scroll", "time"
         ]
     }
 ]
