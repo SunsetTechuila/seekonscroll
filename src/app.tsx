@@ -88,26 +88,16 @@ function main() {
     }
 
     const durationMs = Player.getDuration();
-
     const newProgressMs = Math.floor((newProgressPercent / 100) * durationMs);
-    const newProgressMin = Math.floor(newProgressMs / 60000);
-    const newProgressSec = Math.floor((newProgressMs % 60000) / 1000);
-    const zerosProgress = '0'.repeat(2 - newProgressSec.toString().length);
-    const newProgressTime = `${newProgressMin}:${zerosProgress}${newProgressSec}`;
 
     const isRemainingDisplayed = progressBarRemaining.innerHTML.startsWith('-');
     if (isRemainingDisplayed) {
       const remainingMs = durationMs - newProgressMs;
-      const remainingMin = Math.floor(remainingMs / 60000);
-      const remainingSec = Math.floor((remainingMs % 60000) / 1000);
-      const zerosRemaining = '0'.repeat(2 - remainingSec.toString().length);
-      const remainingTime = `-${remainingMin}:${zerosRemaining}${remainingSec}`;
-
-      progressBarRemaining.innerHTML = remainingTime;
+      progressBarRemaining.innerHTML = `-${Player.formatTime(remainingMs)}`;
     }
 
+    progressBarElapsed.innerHTML = Player.formatTime(newProgressMs);
     style.setProperty('--progress-bar-transform', `${newProgressPercent}%`);
-    progressBarElapsed.innerHTML = newProgressTime;
 
     scrollTimeout = setTimeout(setProgress, 400, newProgressMs);
   }
