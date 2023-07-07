@@ -7,7 +7,6 @@ function main() {
   let progressBar: HTMLDivElement;
   let progressBarElapsed: HTMLDivElement;
   let progressBarRemaining: HTMLDivElement;
-  let ignoreInput: boolean;
   const defaultSkipPercent = '3';
 
   const settings = new SettingsSection('Seek on scroll', 'seekOnScroll');
@@ -26,45 +25,18 @@ function main() {
   settings.addToggle('invertScroll', 'Invert scroll direction', false);
   settings.pushSettings();
 
-  function waitForPlayerState(testState: boolean) {
-    const checkState = setInterval(() => {
-      if (Player.isPlaying() === testState) clearInterval(checkState);
-    }, 50);
-  }
-
-  function waitForPlayerProgress(testProgress: number) {
-    const checkProgress = setInterval(() => {
-      if (Player.getProgress() === testProgress) clearInterval(checkProgress);
-    }, 50);
-  }
-
   function setProgress(newProgressMs: number) {
-    ignoreInput = true;
-
     Player.seek(newProgressMs);
-    waitForPlayerProgress(newProgressMs);
-
-    if (wasPlaying) {
-      Player.play();
-      waitForPlayerState(true);
-    }
-
+    if (wasPlaying) Player.play();
     wasPlaying = null;
-    ignoreInput = false;
   }
 
   function handleScroll(event: WheelEvent) {
-    if (ignoreInput) return;
     if (scrollTimeout) clearTimeout(scrollTimeout);
 
     const isPlaying = Player.isPlaying();
+    if (isPlaying) Player.pause();
     if (wasPlaying == null) wasPlaying = isPlaying;
-    if (isPlaying) {
-      ignoreInput = true;
-      Player.pause();
-      waitForPlayerState(false);
-      ignoreInput = false;
-    }
 
     const { style } = progressBar;
     let { deltaY } = event;
