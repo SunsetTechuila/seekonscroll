@@ -67,8 +67,8 @@ function main() {
     const zerosProgress = '0'.repeat(2 - newProgressSec.toString().length);
     const newProgressTime = `${newProgressMin}:${zerosProgress}${newProgressSec}`;
 
-    const showRemaining = progressBarRemaining.innerHTML.startsWith('-');
-    if (showRemaining) {
+    const isRemainingDisplayed = progressBarRemaining.innerHTML.startsWith('-');
+    if (isRemainingDisplayed) {
       const remainingMs = durationMs - newProgressMs;
       const remainingMin = Math.floor(remainingMs / 60000);
       const remainingSec = Math.floor((remainingMs % 60000) / 1000);
