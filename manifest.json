@@ -3,7 +3,7 @@
         "name": "Seek On Scroll",
         "description": "Skip track time using mouse wheel",
         "main": "/dist/seekonscroll.js",
-        "preview": "/assets/preview_marketplace.gif",
+        "preview": "/assets/preview-marketplace.gif",
         "readme": "README.md",
         "authors": [
             {
