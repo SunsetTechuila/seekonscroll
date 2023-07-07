@@ -85,6 +85,12 @@ function main() {
   }
 
   function onProgressBarLoad() {
+    progressBarElapsed = document.querySelector(
+      '.playback-bar__progress-time-elapsed'
+    ) as HTMLDivElement;
+    progressBarRemaining = document.querySelector(
+      '.main-playbackBarRemainingTime-container'
+    ) as HTMLDivElement;
     progressBar.addEventListener('wheel', (event) => handleScroll(event));
   }
 
@@ -93,12 +99,6 @@ function main() {
       '.playback-bar .playback-progressbar-isInteractive .progress-bar'
     ) as HTMLDivElement;
     if (progressBar) {
-      progressBarElapsed = document.querySelector(
-        '.playback-bar__progress-time-elapsed'
-      ) as HTMLDivElement;
-      progressBarRemaining = document.querySelector(
-        '.main-playbackBarRemainingTime-container'
-      ) as HTMLDivElement;
       onProgressBarLoad();
     } else {
       setTimeout(waitForProgressBar, 100);
