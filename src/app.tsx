@@ -61,7 +61,7 @@ function main() {
 
     const durationMs = Player.getDuration();
 
-    const newProgressMs = (newProgressPercent / 100) * durationMs;
+    const newProgressMs = Math.floor((newProgressPercent / 100) * durationMs);
     const newProgressMin = Math.floor(newProgressMs / 60000);
     const newProgressSec = Math.floor((newProgressMs % 60000) / 1000);
     const zerosProgress = '0'.repeat(2 - newProgressSec.toString().length);
