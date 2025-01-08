@@ -1,22 +1,16 @@
 [
-    {
-        "name": "Seek On Scroll",
-        "description": "Skip track time using mouse wheel",
-        "main": "/dist/seekonscroll.js",
-        "preview": "/assets/preview-marketplace.gif",
-        "readme": "README.md",
-        "authors": [
-            {
-                "name": "SunsetTechuila",
-                "url": "https://github.com/SunsetTechuila"
-            },
-            {
-                "name": "Xyntho",
-                "url": "https://github.com/iamxyntho"
-            }
-        ],
-        "tags": [
-            "utility", "scroll", "time"
-        ]
-    }
+  {
+    "name": "Seek On Scroll",
+    "description": "Skip track time using mouse wheel",
+    "main": "/dist/seekonscroll.js",
+    "preview": "/assets/preview-marketplace.gif",
+    "readme": "README.md",
+    "authors": [
+      {
+        "name": "SunsetTechuila",
+        "url": "https://github.com/SunsetTechuila"
+      }
+    ],
+    "tags": ["utility", "scroll", "time"]
+  }
 ]

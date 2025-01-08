@@ -1,0 +1,5 @@
+{
+  "[typescript][typescriptreact][json][markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
